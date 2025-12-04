@@ -9,6 +9,24 @@ lerna-debug.log*
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+# persistent redis data
+redis-data/
+
+# Serverless
+.serverless/
+
+# LocalStack
+localstack/
+volume/
+
+# local test files
+test-event.json
+test-localstack-api.sh
+response.json
+
+# local documentation files
+md-files/
+
 # Runtime data
 pids
 *.pid
@@ -21,6 +39,8 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+**/coverage
+**/**/coverage
 
 # nyc test coverage
 .nyc_output
@@ -137,3 +157,4 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+

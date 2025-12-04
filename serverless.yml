@@ -1,0 +1,129 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: jrdagala
+
+app: birthday-notification-system
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: birthday-notification-system
+
+plugins:
+  - serverless-localstack
+  - serverless-offline
+
+stages:
+  default:
+    params:
+      tableName: 'users-table-${sls:stage}'
+
+custom:
+  localstack:
+    stages:
+      - local
+      - dev
+      - default
+    host: http://localhost
+    edgePort: 4566
+    autostart: true
+    lambda:
+      mountCode: false
+    docker:
+      sudo: false
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  stage: ${opt:stage, 'local'}
+  # VPC configuration removed - not needed for LocalStack
+  # LocalStack runs locally and accesses Redis via host.docker.internal
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:*
+          Resource:
+            - Fn::GetAtt: [UsersTable, Arn]
+        - Effect: Allow
+          Action:
+            - sqs:*
+          Resource:
+            - Fn::GetAtt:
+                - BirthdayNotificationQueue
+                - Arn
+
+  environment:
+    USERS_TABLE: ${param:tableName}
+    DYNAMODB_ENDPOINT: http://host.docker.internal:4566 # use this for localstack
+    # DYNAMODB_ENDPOINT: http://localhost:4566 # use this for serverless offline
+    AWS_REGION: us-east-1
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+    PIPEDREAM_URL: https://eo6mwyoysipqoak.m.pipedream.net
+    REDIS_HOST: host.docker.internal
+    REDIS_PORT: 6379
+    SQS_NOTIFIER_QUEUE_NAME:
+      Ref: BirthdayNotificationQueue
+    SQS_NOTIFIER_QUEUE_ARN:
+      Fn::GetAtt: [BirthdayNotificationQueue, Arn]
+
+functions:
+  userAPI:
+    handler: src/handlers/user.api
+    events:
+      - http:
+          path: user
+          method: post
+          cors: true
+      - http:
+          path: user
+          method: put
+          cors: true
+      - http:
+          path: user/{userId}
+          method: delete
+          cors: true
+
+  scheduler:
+    handler: src/handlers/scheduler.run
+    environment:
+      SQS_NOTIFIER_QUEUE_NAME:
+        Ref: BirthdayNotificationQueue
+      SQS_NOTIFIER_QUEUE_ARN:
+        Fn::GetAtt: [BirthdayNotificationQueue, Arn]
+    events:
+      - schedule:
+          rate: cron(0/5 * * * ? *)
+
+  notifier:
+    handler: src/handlers/notifier.consumer
+    timeout: 60
+    memorySize: 256
+    reservedConcurrency: 1000 # Increase if needed (default is 1000 per account)
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - BirthdayNotificationQueue
+              - Arn
+          batchSize: 10 # Process up to 10 messages per invocation
+          functionResponseType: ReportBatchItemFailures # Enable partial batch failure handling
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:tableName}
+
+    BirthdayNotificationQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: birthday-notification-queue-${sls:stage}
+        VisibilityTimeout: 90
+        MessageRetentionPeriod: 1209600
+        ReceiveMessageWaitTimeSeconds: 20

@@ -1,0 +1,22 @@
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
+    image: localstack/localstack-pro
+    ports:
+      - "127.0.0.1:4566:4566" # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559" # external services port range
+    environment:
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN}
+      - DEBUG=${DEBUG:-0}
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  redis:
+    container_name: "localstack-redis"
+    image: redis:7.2-alpine # A lightweight Redis image
+    command: redis-server --appendonly yes
+    ports:
+      - "127.0.0.1:6379:6379" # Exposes Redis on default port 6379 on your local machine
+    volumes:
+      - "./redis-data:/data" # Persist Redis data in a local directory
