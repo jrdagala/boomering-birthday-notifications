@@ -26,12 +26,30 @@ describe('timezone utilities', () => {
         state: 'New York',
         country: 'USA',
       };
+      const day = 25;
+      const hour = 9;
+      const minute = 0;
+      const second = 0;
+      const timezone = 'America/New_York';
       const birthday = '1990-12-25'; // Christmas
 
       const result = calculateNextBirthdayUTC(birthday, location);
       const nextBirthday = moment(result);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2024,
+          month: 11, // December is 11
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
-      expect(nextBirthday.format('YYYY-MM-DD')).toBe('2024-12-25');
+      expect(nextBirthday.format('YYYY-MM-DD')).toBe(
+        expectedNextBirthday.utc().format('YYYY-MM-DD')
+      );
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
     });
 
@@ -41,13 +59,29 @@ describe('timezone utilities', () => {
         state: 'California',
         country: 'USA',
       };
+      const day = 15;
+      const hour = 9;
+      const minute = 0;
+      const second = 0;
+      const timezone = 'America/Los_Angeles';
       const birthday = '1985-03-15';
 
       const result = calculateNextBirthdayUTC(birthday, location);
       const nextBirthday = moment(result);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2025,
+          month: 2, // March is 2
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
       // Birthday already passed this year, should be next year
-      expect(nextBirthday.year()).toBeGreaterThanOrEqual(2025);
+      expect(nextBirthday.toISOString()).toBe(expectedNextBirthday.utc().toISOString());
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
     });
 
@@ -56,12 +90,28 @@ describe('timezone utilities', () => {
         city: 'London',
         country: 'UK',
       };
+      const day = 20;
+      const hour = 9;
+      const minute = 0;
+      const second = 0;
+      const timezone = 'Europe/London';
       const birthday = '1992-08-20';
 
       const result = calculateNextBirthdayUTC(birthday, location);
       const nextBirthday = moment(result);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2024,
+          month: 7, // August is 7
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
-      expect(nextBirthday.format('MM-DD')).toBe('08-20');
+      expect(nextBirthday.toISOString()).toBe(expectedNextBirthday.utc().toISOString());
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
     });
 
@@ -70,12 +120,28 @@ describe('timezone utilities', () => {
         city: 'Tokyo',
         country: 'Japan',
       };
+      const day = 11;
+      const hour = 9;
+      const minute = 0;
+      const second = 0;
+      const timezone = 'Asia/Tokyo';
       const birthday = '1988-11-11';
 
       const result = calculateNextBirthdayUTC(birthday, location);
       const nextBirthday = moment(result);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2024,
+          month: 10, // November is 10
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
-      expect(nextBirthday.format('MM-DD')).toBe('11-11');
+      expect(nextBirthday.toISOString()).toBe(expectedNextBirthday.utc().toISOString());
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
     });
 
@@ -84,13 +150,29 @@ describe('timezone utilities', () => {
         city: 'Sydney',
         country: 'Australia',
       };
+      const day = 10;
+      const hour = 9;
+      const minute = 0;
+      const second = 0;
+      const timezone = 'Australia/Sydney';
       const birthday = '1995-01-10';
 
       const result = calculateNextBirthdayUTC(birthday, location);
-      const nextBirthday = moment(result);
+      const nextBirthday = moment(result).tz(timezone);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2025,
+          month: 0,
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
       // Birthday already passed, should be next year
-      expect(nextBirthday.format('YYYY-MM-DD')).toBe('2025-01-10');
+      expect(nextBirthday.toISOString()).toBe(expectedNextBirthday.utc().toISOString());
     });
 
     it('should use next year if birthday already passed this year', () => {
@@ -99,13 +181,28 @@ describe('timezone utilities', () => {
         state: 'New York',
         country: 'USA',
       };
+      const day = 1;
+      const hour = 9;
+      const minute = 0;
+      const second = 0;
+      const timezone = 'America/New_York';
       const birthday = '1990-01-01'; // Already passed
 
       const result = calculateNextBirthdayUTC(birthday, location);
       const nextBirthday = moment(result);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2025,
+          month: 0, // January is 0
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
-      expect(nextBirthday.year()).toBe(2025);
-      expect(nextBirthday.format('MM-DD')).toBe('01-01');
+      expect(nextBirthday.format('YYYY-MM-DD')).toBe(expectedNextBirthday.format('YYYY-MM-DD'));
     });
 
     it('should use this year if birthday is upcoming', () => {
@@ -114,13 +211,28 @@ describe('timezone utilities', () => {
         state: 'New York',
         country: 'USA',
       };
+      const day = 31;
+      const hour = 9;
+      const minute = 0;
+      const second = 0;
+      const timezone = 'America/New_York';
       const birthday = '1990-12-31'; // Not yet passed
 
       const result = calculateNextBirthdayUTC(birthday, location);
       const nextBirthday = moment(result);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2024,
+          month: 11, // December is 11
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
-      expect(nextBirthday.year()).toBe(2024);
-      expect(nextBirthday.format('MM-DD')).toBe('12-31');
+      expect(nextBirthday.format('YYYY-MM-DD')).toBe(expectedNextBirthday.format('YYYY-MM-DD'));
     });
 
     it('should default to UTC for unknown location', () => {
@@ -128,14 +240,30 @@ describe('timezone utilities', () => {
         city: 'Unknown City',
         country: 'Unknown Country',
       };
+      const day = 15;
+      const hour = 0; // Default to 0 for UTC comparison if not specified
+      const minute = 0;
+      const second = 0;
+      const timezone = 'UTC';
       const birthday = '1990-09-15';
 
       const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
 
       const result = calculateNextBirthdayUTC(birthday, location);
-      const nextBirthday = moment(result);
+      const nextBirthday = moment(result).tz(timezone);
+      const expectedNextBirthday = moment.tz(
+        {
+          year: 2024, // Assuming current year is 2024 for the test context
+          month: 8, // September is 8
+          day,
+          hour,
+          minute,
+          second,
+        },
+        timezone
+      );
 
-      expect(nextBirthday.format('MM-DD')).toBe('09-15');
+      expect(nextBirthday.format('YYYY-MM-DD')).toBe(expectedNextBirthday.format('YYYY-MM-DD'));
       expect(consoleWarnSpy).toHaveBeenCalled();
 
       consoleWarnSpy.mockRestore();
