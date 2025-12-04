@@ -15,6 +15,8 @@ describe('timezone utilities', () => {
     });
 
     afterEach(() => {
+      jest.clearAllMocks();
+      jest.clearAllTimers();
       jest.useRealTimers();
     });
 
