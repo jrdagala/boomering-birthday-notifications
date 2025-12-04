@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set timezone to UTC
+        run: echo "TZ=UTC" >> $GITHUB_ENV
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:

@@ -122,6 +122,9 @@ export function calculateNextBirthdayUTC(birthday: string, location: Location): 
 
   // Parse the birthday
   const [, month, day] = birthday.split('-').map(Number);
+  const hour = 9;
+  const minute = 0;
+  const second = 0;
 
   // Get current time in user's timezone
   const nowInTimezone = moment.tz(timezone);
@@ -132,10 +135,10 @@ export function calculateNextBirthdayUTC(birthday: string, location: Location): 
     {
       year: currentYear,
       month: month - 1, // moment months are 0-indexed
-      day: day,
-      hour: 9,
-      minute: 0,
-      second: 0,
+      day,
+      hour,
+      minute,
+      second,
     },
     timezone
   );
@@ -146,10 +149,10 @@ export function calculateNextBirthdayUTC(birthday: string, location: Location): 
       {
         year: currentYear + 1,
         month: month - 1,
-        day: day,
-        hour: 9,
-        minute: 0,
-        second: 0,
+        day,
+        hour,
+        minute,
+        second,
       },
       timezone
     );
