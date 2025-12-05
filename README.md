@@ -10,7 +10,7 @@ A scalable, serverless birthday notification system built with TypeScript, AWS L
 
 This system uses a **microservices architecture** with three main services:
 
-1. **User API Service**: REST API for managing users (Create, Update, Delete)c
+1. **User API Service**: REST API for managing users (Create, Update, Delete)
 2. **Scheduler Service**: Hourly cron job that identifies users whose birthday is today
 3. **Notifier Service**: SQS consumer that sends birthday messages and handles deduplication
 
@@ -147,7 +147,7 @@ awslocal --endpoint-url=http://localhost:4566 sqs receive-message \
 
 ```bash
 docker exec -it $(docker ps -q -f name=redis) redis-cli
-> KEYS sent:*
+> KEYS notification:${userId}:${new Date().getFullYear()}
 ```
 
 ## Configuration
