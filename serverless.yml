@@ -12,7 +12,7 @@ plugins:
 stages:
   default:
     params:
-      tableName: 'users-table-${sls:stage}'
+      usersTableName: 'users-table-${sls:stage}'
 
 custom:
   localstack:
@@ -51,12 +51,13 @@ provider:
                 - Arn
 
   environment:
-    USERS_TABLE: ${param:tableName}
+    USERS_TABLE: ${param:usersTableName}
     DYNAMODB_ENDPOINT: http://host.docker.internal:4566 # use this for localstack
     # DYNAMODB_ENDPOINT: http://localhost:4566 # use this for serverless offline
     AWS_REGION: us-east-1
     AWS_ACCESS_KEY_ID: test
     AWS_SECRET_ACCESS_KEY: test
+    NOTIFICATION_TYPE: pipedream
     PIPEDREAM_URL: https://eo6mwyoysipqoak.m.pipedream.net
     REDIS_HOST: host.docker.internal
     REDIS_PORT: 6379
@@ -91,7 +92,7 @@ functions:
         Fn::GetAtt: [BirthdayNotificationQueue, Arn]
     events:
       - schedule:
-          rate: cron(0/5 * * * ? *)
+          rate: cron(0 * * * ? *) # hourly
 
   notifier:
     handler: src/handlers/notifier.consumer
@@ -118,7 +119,7 @@ resources:
           - AttributeName: userId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: ${param:tableName}
+        TableName: ${param:usersTableName}
 
     BirthdayNotificationQueue:
       Type: AWS::SQS::Queue

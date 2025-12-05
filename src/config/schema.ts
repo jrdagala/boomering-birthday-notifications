@@ -7,7 +7,7 @@ interface AwsConfig {
 }
 
 interface DynamoDBEnvConfig {
-  tableName: string;
+  usersTableName: string;
   endpoint?: string;
 }
 interface RedisEnvConfig {
@@ -27,6 +27,8 @@ interface ConfigSchema {
   redis: RedisEnvConfig;
   sqs: SqsConfig;
   stage: string;
+  pipedreamURL: string;
+  notificationType: string;
 }
 
 const schema = convict<ConfigSchema>({
@@ -71,11 +73,11 @@ const schema = convict<ConfigSchema>({
     },
   },
   dynamodb: {
-    tableName: {
+    usersTableName: {
       doc: 'DynamoDB table name',
       format: String,
       default: 'users-table',
-      env: 'DYNAMODB_TABLE_NAME',
+      env: 'USERS_TABLE',
     },
     endpoint: {
       doc: 'DynamoDB endpoint (useful for LocalStack or local development)',
@@ -103,6 +105,18 @@ const schema = convict<ConfigSchema>({
     format: String,
     default: 'local',
     env: 'STAGE',
+  },
+  pipedreamURL: {
+    doc: 'Pipedream webhook URL',
+    format: String,
+    default: 'https://eo6mwyoysipqoak.m.pipedream.net',
+    env: 'PIPEDREAM_URL',
+  },
+  notificationType: {
+    doc: 'Notification type',
+    format: ['pipedream', 'email'],
+    default: 'pipedream',
+    env: 'NOTIFICATION_TYPE',
   },
 });
 

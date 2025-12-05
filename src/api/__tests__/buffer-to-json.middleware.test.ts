@@ -93,7 +93,8 @@ describe('bufferToJsonMiddleware', () => {
     bufferToJsonMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Failed to parse buffer to JSON:',
+      '[bufferToJsonMiddleware]',
+      '[bufferToJsonMiddleware] Failed to parse buffer to JSON:',
       expect.any(Error)
     );
     expect(mockStatus).toHaveBeenCalledWith(400);

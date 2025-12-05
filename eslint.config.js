@@ -35,6 +35,12 @@ export default [
     },
   },
   {
+    files: ['**/__tests__/**/*.ts', '**/*.test.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
     ignores: ['node_modules/', 'dist/', 'coverage/', '.serverless/', '**/*.js', '!src/**/*.ts'],
   },
 ];

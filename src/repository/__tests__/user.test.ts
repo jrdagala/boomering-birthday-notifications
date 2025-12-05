@@ -271,8 +271,10 @@ describe('UserRepository', () => {
   describe('getUsersForNotification', () => {
     it('should query users with nextBirthdayUTC <= now', async () => {
       const mockQuery = {
-        le: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
         using: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        le: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue([
           {
             ...mockUser,
@@ -286,9 +288,11 @@ describe('UserRepository', () => {
 
       await repository.getUsersForNotification();
 
-      expect(User.query).toHaveBeenCalledWith('nextBirthdayUTC');
-      expect(mockQuery.le).toHaveBeenCalled();
+      expect(User.query).toHaveBeenCalledWith('birthdayReminderPK');
+      expect(mockQuery.eq).toHaveBeenCalledWith('BIRTHDAY_REMINDER');
       expect(mockQuery.using).toHaveBeenCalledWith('nextBirthdayIndex');
+      expect(mockQuery.where).toHaveBeenCalledWith('nextBirthdayUTC');
+      expect(mockQuery.le).toHaveBeenCalled();
       expect(mockQuery.exec).toHaveBeenCalled();
     });
 
@@ -315,8 +319,10 @@ describe('UserRepository', () => {
       ];
 
       const mockQuery = {
-        le: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
         using: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        le: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(users),
       };
 
@@ -331,8 +337,10 @@ describe('UserRepository', () => {
 
     it('should return empty array if no users found', async () => {
       const mockQuery = {
-        le: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
         using: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        le: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue([]),
       };
 

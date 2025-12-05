@@ -1,5 +1,6 @@
 import Redis, { RedisOptions } from 'ioredis';
 import { getEnvConfig } from '../config';
+import { initLogger } from '../utils/logger';
 
 let redisClient: Redis | null = null;
 
@@ -9,6 +10,7 @@ let redisClient: Redis | null = null;
  */
 export function initializeRedis(): Redis {
   const { redis } = getEnvConfig();
+  const logger = initLogger('Redis');
 
   const redisOptions: RedisOptions = {
     host: redis.host,
@@ -27,19 +29,19 @@ export function initializeRedis(): Redis {
 
   // Handle connection events
   redisClient.on('connect', () => {
-    console.log('Redis client connecting...');
+    logger.info('Redis client connecting...');
   });
 
   redisClient.on('ready', () => {
-    console.log('Redis client ready');
+    logger.info('Redis client ready');
   });
 
   redisClient.on('error', (error) => {
-    console.error('Redis client error:', error);
+    logger.error('Redis client error:', error);
   });
 
   redisClient.on('close', () => {
-    console.log('Redis client connection closed');
+    logger.info('Redis client connection closed');
   });
 
   return redisClient;
@@ -62,3 +64,5 @@ export async function closeRedis(): Promise<void> {
     redisClient = null;
   }
 }
+
+export { Redis };
