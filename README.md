@@ -1,5 +1,7 @@
 # Birthday Message Notification System
 
+[![Continuous Integration](https://github.com/jrdagala/boomering-birthday-notifications/actions/workflows/ci.yml/badge.svg)](https://github.com/jrdagala/boomering-birthday-notifications/actions/workflows/ci.yml)
+
 A scalable, serverless birthday notification system built with TypeScript, AWS Lambda, DynamoDB, Redis, and SQS. The system sends birthday greetings to users at exactly 9:00 AM in their local timezone.
 
 ## Architecture
@@ -8,7 +10,7 @@ A scalable, serverless birthday notification system built with TypeScript, AWS L
 
 This system uses a **microservices architecture** with three main services:
 
-1. **User API Service**: REST API for managing users (Create, Update, Delete)
+1. **User API Service**: REST API for managing users (Create, Update, Delete)c
 2. **Scheduler Service**: Hourly cron job that identifies users whose birthday is today
 3. **Notifier Service**: SQS consumer that sends birthday messages and handles deduplication
 
