@@ -1,5 +1,6 @@
 import * as dynamoose from 'dynamoose';
 import { getEnvConfig } from '../config';
+import { initLogger } from '../utils/logger';
 
 /**
  * Initialize DynamoDB configuration
@@ -28,25 +29,9 @@ export function initializeDynamoDB(): void {
 
   const { region, accessKeyId, secretAccessKey } = aws;
   const { endpoint } = dynamodb;
+  const logger = initLogger('DynamoDB');
 
-  console.log(
-    'initializing DynamoDB',
-    JSON.stringify(
-      {
-        endpoint,
-        region,
-        credentials:
-          endpoint && accessKeyId && secretAccessKey
-            ? {
-                accessKeyId,
-                secretAccessKey,
-              }
-            : undefined,
-      },
-      null,
-      2
-    )
-  );
+  logger.info('initializing DynamoDB');
 
   // Create DynamoDB instance
   const ddb = new dynamoose.aws.ddb.DynamoDB({
@@ -64,5 +49,5 @@ export function initializeDynamoDB(): void {
   // Set Dynamoose to use this DynamoDB instance
   dynamoose.aws.ddb.set(ddb);
 
-  console.log('DynamoDB initialized', { endpoint, region });
+  logger.info('DynamoDB initialized');
 }

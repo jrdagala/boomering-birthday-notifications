@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import User from '../models/user';
 import { IUser, CreateUserInput, UpdateUserInput } from '../types/user';
 import { calculateNextBirthdayUTC, getCurrentYear } from '../utils/timezone';
+import { initLogger } from '../utils/logger';
 
 /**
  * User Repository
@@ -78,16 +79,34 @@ export class UserRepository {
    * Queries users with nextBirthdayUTC <= now
    */
   async getUsersForNotification(): Promise<IUser[]> {
+    const logger = initLogger('UserRepository');
     // Add 1 minute buffer to avoid race conditions
     const now = new Date(Date.now() + 60 * 1000).toISOString();
-    const currentYear = getCurrentYear();
+    const currentYear = getCurrentYear(); // e.g., 2025
 
-    const results = await User.query('nextBirthdayUTC').le(now).using('nextBirthdayIndex').exec();
+    const partitionKeyValue = 'BIRTHDAY_REMINDER';
+    const results = await User.query('birthdayReminderPK')
+      .eq(partitionKeyValue)
+      .using('nextBirthdayIndex')
+      .where('nextBirthdayUTC')
+      .le(now)
+      .exec();
 
-    // Filter by lastNotificationYear to avoid duplicates
-    return results
-      .filter((user: any) => user.lastNotificationYear < currentYear)
-      .map((user: any) => user.toJSON() as IUser);
+    const filteredUsers = results.filter(
+      (userDoc: any) => userDoc.lastNotificationYear < currentYear
+    );
+
+    if (!filteredUsers || filteredUsers.length === 0) {
+      logger.info(
+        '[UserRepository] [getUsersForNotification] No users found requiring processing.'
+      );
+      return [];
+    }
+
+    logger.info(
+      `[UserRepository] [getUsersForNotification] Found ${filteredUsers.length} users to send to SQS.`
+    );
+    return filteredUsers.map((userDoc: any) => userDoc.toJSON() as IUser);
   }
 
   /**

@@ -1,4 +1,5 @@
 import moment from 'moment-timezone';
+import { initLogger } from './logger';
 
 /**
  * Location interface for timezone lookup
@@ -22,6 +23,8 @@ export function getTimezoneFromLocation(
   state: string | undefined,
   country: string
 ): string {
+  const logger = initLogger('Timezone');
+
   // Simplified timezone mapping by city/state/country
   // In production, use a proper timezone API or database
 
@@ -105,7 +108,9 @@ export function getTimezoneFromLocation(
   }
 
   // Default to UTC if unknown
-  console.warn(`Unknown timezone for location: ${city}, ${state}, ${country}. Using UTC.`);
+  logger.warn(
+    `[getTimezoneFromLocation] Unknown timezone for location: ${city}, ${state}, ${country}. Using UTC.`
+  );
   return 'UTC';
 }
 

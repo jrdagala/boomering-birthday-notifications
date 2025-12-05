@@ -8,7 +8,7 @@ module.exports = {
     '!src/handlers/user.ts', // Express app setup
     '!src/api/user.router.ts', // Router setup
     '!src/config/schema.ts', // Convict schema configuration
-    '!src/services/**/*.ts', // Simple initialization code
+    '!src/init/**/*.ts', // Simple initialization code
     '!src/**/__tests__/**',
     '!src/**/index.ts',
   ],

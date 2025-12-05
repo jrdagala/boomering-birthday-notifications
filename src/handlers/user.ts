@@ -2,13 +2,16 @@ import express from 'express';
 import serverless from 'serverless-http';
 import { UsersRouter } from '../api/user.router';
 import { bufferToJsonMiddleware } from '../api/buffer-to-json.middleware';
-import { initializeDynamoDB } from '../services/dynamodb';
+import { initializeDynamoDB } from '../init/dynamodb';
+import { initLogger } from '../utils/logger';
+
+const logger = initLogger('User');
 
 // Initialize DynamoDB before any requests
 try {
   initializeDynamoDB();
 } catch (error) {
-  console.error('Failed to initialize DynamoDB:', error);
+  logger.error('Failed to initialize DynamoDB:', error);
 }
 
 const app = express();
